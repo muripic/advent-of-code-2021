@@ -1,11 +1,11 @@
-require_relative "../helpers"
+require_relative '../helpers'
 
 DisplayInfo = Struct.new(:patterns, :digits)
 
 def read_input(file_path)
-  input = File.read(file_path).split("\n").map { |line| line.split(" | ") }
+  input = File.read(file_path).split("\n").map { |line| line.split(' | ') }
   input.map! do |line|
-    DisplayInfo.new(line[0].split(" ").map(&:chars), line[1].split(" ").map(&:chars))
+    DisplayInfo.new(line[0].split(' ').map(&:chars), line[1].split(' ').map(&:chars))
   end
 end
 
@@ -51,9 +51,9 @@ def find_mapping(line)
   # Go back to 7: the remaining char will be a.
   encoded_a = (seven - encoded_c_and_f)[0]
 
-  solution[encoded_f.to_sym] = "f"
-  solution[encoded_c.to_sym] = "c"
-  solution[encoded_a.to_sym] = "a"
+  solution[encoded_f.to_sym] = 'f'
+  solution[encoded_c.to_sym] = 'c'
+  solution[encoded_a.to_sym] = 'a'
 
   # 2) Find B and D
   # Go back to 4, remove c and f. The remaining two chars map to b and d.
@@ -63,8 +63,8 @@ def find_mapping(line)
   encoded_b = find_common_chars(encoded_b_and_d, *digits_with_six_segs)[0]
   encoded_d = encoded_b_and_d.find { |char| char != encoded_b }
 
-  solution[encoded_b.to_sym] = "b"
-  solution[encoded_d.to_sym] = "d"
+  solution[encoded_b.to_sym] = 'b'
+  solution[encoded_d.to_sym] = 'd'
 
   # 4) Find E and G
   # Only e and g remaining. In 0, 6, and 9, g is in 3, e is in 2, so
@@ -73,8 +73,8 @@ def find_mapping(line)
   encoded_g = find_common_chars(encoded_g_and_e, *digits_with_six_segs)[0]
   encoded_e = encoded_g_and_e.find { |char| char != encoded_g }
 
-  solution[encoded_g.to_sym] = "g"
-  solution[encoded_e.to_sym] = "e"
+  solution[encoded_g.to_sym] = 'g'
+  solution[encoded_e.to_sym] = 'e'
   solution
 end
 
@@ -85,7 +85,7 @@ def decode_number(mapping, line)
   pow = 3
   line.digits.each do |digit|
     digit.map! { |char| mapping[char.to_sym] }.sort!
-    num += num_codes[digit.join("")] * 10 ** pow
+    num += num_codes[digit.join('')] * 10**pow
     pow -= 1
   end
   num
@@ -95,5 +95,5 @@ def decode(input)
   input.inject(0) { |sum, line| sum + decode_number(find_mapping(line), line) }
 end
 
-run("1", :count_easy_digits, 26)
-run("2", :decode, 61_229)
+run('1', :count_easy_digits, 26)
+run('2', :decode, 61_229)

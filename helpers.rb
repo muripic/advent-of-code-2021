@@ -1,12 +1,16 @@
-def run_test(method_to_test, expected_res)
-  puts 'Running test...'
-  test_input = read_input('test_input.txt')
-  res = method(method_to_test).call(test_input)
+def print_test_message(res, expected_res)
   if res == expected_res
     puts "Yay! Test passed with expected result #{res}."
   else
     puts "Try again! Test failed with result #{res}, but expected #{expected_res}."
   end
+end
+
+def run_test(method_to_test, expected_res)
+  puts 'Running test...'
+  test_input = read_input('test_input.txt')
+  res = method(method_to_test).call(test_input)
+  print_test_message(res, expected_res)
 end
 
 def run_for_real(method_to_run)

@@ -1,64 +1,55 @@
-Point = Struct.new(:x, :y)
+require_relative '../helpers'
 
-def read_input(_file_path)
-  lines = File.read('input.txt').split("\n")
-  points = lines.each_with_object([]) do |line, pts|
-    if line.include?(',')
-      x, y = line.split(',').map!(&:to_i)
-      pts << Point.new(x, y)
-    end
-  end
-  folds = lines.select { |line| line if line.include?('fold') }
-  folds.map! { |line| line.split('=') }
+def read_input(file_path)
+  lines = File.read(file_path).split("\n")
+  points = (lines.select { |ln| ln.include?(',') }).map { |ln| ln.split(',').map!(&:to_i) }
+  folds = (lines.select { |ln| ln.include?('fold') }).map! { |ln| ln.split('=') }
   [points, folds]
 end
 
-def fold(points, axis, value)
-  folded_points = []
-  if axis == 'y'
-    # Horizontal fold
-    points.each do |pt|
-      # New y is equal to prev y - (distance fo prev y to fold)*2
-      folded_points << (pt.y >= value ? Point.new(pt.x, pt.y - (pt.y - value) * 2) : pt)
-    end
-  elsif axis == 'x'
-    # Vertical fold
-    points.each do |pt|
-      folded_points << (pt.x >= value ? Point.new(pt.x - (pt.x - value) * 2, pt.y) : pt)
-    end
+def transform_pair(x, y, axis, value)
+  if axis == 'y' && y >= value # Horizontal fold
+    # New y is equal to prev y - (distance fo prev y to fold)*2
+    [x, y - (y - value) * 2]
+  elsif axis == 'x' && x >= value # Vertical fold
+    [x - (x - value) * 2, y]
+  else
+    [x, y]
   end
-  folded_points
 end
 
-def fold_once(points, folds)
-  fold = folds[0]
-  fold(points, fold[0][-1], fold[1].to_i).tally.count
+def fold(points, axis, value)
+  points.map { |x, y| transform_pair(x, y, axis, value) }
+end
+
+def fold_once(input)
+  points, folds = input
+  first_fold = folds[0]
+  fold(points, first_fold[0][-1], first_fold[1].to_i).tally.count
 end
 
 def fold_all(points, folds)
-  folds.each do |axis, value|
-    points = fold(points, axis[-1], value.to_i)
-  end
-  points
+  folds.inject(points) { |pts, fold| fold(pts, fold[0][-1], fold[1].to_i) }
 end
 
 def draw(points)
-  rows = points.map(&:y).max + 1
-  cols = points.map(&:x).max + 1
+  rows = points.map(&:last).max + 1
+  cols = points.map(&:first).max + 1
   matrix = Array.new(rows) { Array.new(cols, '.') }
-  points.each do |pt|
-    matrix[pt.y][pt.x] = 'X'
-  end
-  matrix.each { |row| puts row.join(' ') }
+  points.each { |x, y| matrix[y][x] = 'X' }
+  (matrix.map { |row| row.join(' ') }).join("\n")
 end
 
-points, folds = read_input('input.txt')
+def fold_and_draw(input)
+  points, folds = input
+  draw(fold_all(points, folds))
+end
 
-puts '|*-*-* PART 1 *-*-*|'
+expected_res_part_two = 'X X X X X
+X . . . X
+X . . . X
+X . . . X
+X X X X X'
 
-puts fold_once(points, folds)
-
-puts '|*-*-* PART 2 *-*-*|'
-
-points = fold_all(points, folds)
-draw(points)
+run('1', :fold_once, 17)
+run('2', :fold_and_draw, expected_res_part_two)

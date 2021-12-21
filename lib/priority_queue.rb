@@ -56,7 +56,7 @@ class PriorityQueue
 
   def heapify_up(i)
     # Return if elem is root or if parent has higher priority than the child
-    return if index.zero? || @queue[parent(index)][1] < @queue[index][1]
+    return if i.zero? || @queue[parent(i)][1] < @queue[i][1]
 
     # Swap the child with the parent and keep going up
     @queue[i], @queue[parent(i)] = @queue[parent(i)], @queue[i]
